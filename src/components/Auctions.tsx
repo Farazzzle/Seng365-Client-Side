@@ -21,6 +21,8 @@ import {
     SelectChangeEvent,
     Chip,
     ButtonGroup,
+    Pagination,
+    Stack,
 } from "@mui/material";
 import { Theme, useTheme } from "@mui/material/styles";
 
@@ -62,10 +64,12 @@ export const Auctions = () => {
         setSort(event.target.value);
     };
 
+    const [pageStart, setPageStart] = useState(0);
+
     const retrieveAuctions = () => {
         const filtering = {
-            // startIndex: (pageNumber - 1) * displayAmount,
-            // count: displayAmount,
+            startIndex: pageStart,
+            count: pageStart + 10,
             sortBy: sort,
             q: searchQ,
             categoryIds: categories
@@ -113,7 +117,7 @@ export const Auctions = () => {
 
     useEffect(() => {
         retrieveAuctions();
-    }, [searchQ, selectCategories, status, sort]);
+    }, [searchQ, selectCategories, status, sort, pageStart]);
 
     const getRemainingTime = (date: any) => {
         let closingDate = new Date(date);
@@ -280,7 +284,18 @@ export const Auctions = () => {
                             : `Retrieved ${count} auctions.`}
                     </p>
                 </Box>
-
+                <Stack spacing={5}>
+                    <Pagination
+                        count={Math.ceil(count / 10)}
+                        color="secondary"
+                        showFirstButton
+                        showLastButton
+                        onChange={(event: React.ChangeEvent<unknown>, page: number) => {
+                            setPageStart(page * 10 - 10);
+                        }}
+                        sx={{ justifyContent: "center", display: "flex" }}
+                    />
+                </Stack>
                 <div className="auctions_cards_wrapper">{listOfAuctions()}</div>
             </div>
         );
