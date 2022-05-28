@@ -20,6 +20,7 @@ import {
     Select,
     SelectChangeEvent,
     Chip,
+    ButtonGroup,
 } from "@mui/material";
 import { Theme, useTheme } from "@mui/material/styles";
 
@@ -44,7 +45,6 @@ export const Auctions = () => {
 
     const theme = useTheme();
     const [selectCategories, setSelectCategories] = useState<string[]>([]);
-
     const handleCategorySelector = (event: SelectChangeEvent<typeof selectCategories>) => {
         const {
             target: { value },
@@ -54,6 +54,8 @@ export const Auctions = () => {
             typeof value === "string" ? value.split(",") : value
         );
     };
+
+    const [status, setStatus] = useState("ANY");
 
     const retrieveAuctions = () => {
         const filtering = {
@@ -66,7 +68,7 @@ export const Auctions = () => {
                 .map((item: any) => {
                     return item.categoryId;
                 }),
-            // status: statusString,
+            status: status,
         };
         axios.get(`http://localhost:4941/api/v1/auctions`, { params: filtering }).then(
             (response) => {
@@ -101,20 +103,12 @@ export const Auctions = () => {
     };
 
     useEffect(() => {
-        retrieveAuctions();
-    }, [searchQ, selectCategories]);
-
-    console.log(
-        categories
-            .filter((item: any) => selectCategories.includes(item.name))
-            .map((item: any) => {
-                return item.categoryId;
-            })
-    );
-
-    useEffect(() => {
         getCategories();
     }, []);
+
+    useEffect(() => {
+        retrieveAuctions();
+    }, [searchQ, selectCategories, status]);
 
     const getRemainingTime = (date: any) => {
         let closingDate = new Date(date);
@@ -243,6 +237,17 @@ export const Auctions = () => {
                                 ))}
                         </Select>
                     </FormControl>
+                    <ButtonGroup sx={{ width: 300 }} size="large" aria-label="large button group">
+                        <Button key="all" onClick={() => setStatus("ANY")}>
+                            Show All
+                        </Button>
+                        <Button key="open" onClick={() => setStatus("OPEN")}>
+                            Show Open
+                        </Button>
+                        <Button key="close" onClick={() => setStatus("CLOSED")}>
+                            Show Closed
+                        </Button>
+                    </ButtonGroup>
                     <p style={{ color: "gray" }}>
                         {count <= 1
                             ? count === 0
