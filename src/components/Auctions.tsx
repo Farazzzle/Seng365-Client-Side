@@ -57,11 +57,16 @@ export const Auctions = () => {
 
     const [status, setStatus] = useState("ANY");
 
+    const [sort, setSort] = useState("CLOSING_SOON");
+    const handleSortChange = (event: SelectChangeEvent) => {
+        setSort(event.target.value);
+    };
+
     const retrieveAuctions = () => {
         const filtering = {
             // startIndex: (pageNumber - 1) * displayAmount,
             // count: displayAmount,
-            // sortBy: convertToBackEndSort(sortByString),
+            sortBy: sort,
             q: searchQ,
             categoryIds: categories
                 .filter((item: any) => selectCategories.includes(item.name))
@@ -108,7 +113,7 @@ export const Auctions = () => {
 
     useEffect(() => {
         retrieveAuctions();
-    }, [searchQ, selectCategories, status]);
+    }, [searchQ, selectCategories, status, sort]);
 
     const getRemainingTime = (date: any) => {
         let closingDate = new Date(date);
@@ -248,6 +253,25 @@ export const Auctions = () => {
                             Show Closed
                         </Button>
                     </ButtonGroup>
+                    <FormControl>
+                        <InputLabel id="select-label">Sort By</InputLabel>
+                        <Select
+                            labelId="select-label"
+                            id="simple-select"
+                            value={sort}
+                            label="Sort By"
+                            onChange={handleSortChange}
+                        >
+                            <MenuItem value="CLOSING_SOON">Closing Soon</MenuItem>
+                            <MenuItem value="CLOSING_LAST">Closing Last</MenuItem>
+                            <MenuItem value="BIDS_DESC">Highest Bid</MenuItem>
+                            <MenuItem value="BIDS_ASC">Lowest Bid</MenuItem>
+                            <MenuItem value="RESERVE_DESC">Highest Reserve</MenuItem>
+                            <MenuItem value="RESERVE_ASC">Lowest Reserve</MenuItem>
+                            <MenuItem value="ALPHABETICAL_ASC">Alphabetical A-Z</MenuItem>
+                            <MenuItem value="ALPHABETICAL_DESC">Alphabetical Z-A</MenuItem>
+                        </Select>
+                    </FormControl>
                     <p style={{ color: "gray" }}>
                         {count <= 1
                             ? count === 0
