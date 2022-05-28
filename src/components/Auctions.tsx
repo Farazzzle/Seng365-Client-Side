@@ -23,10 +23,14 @@ import {
 } from "@mui/material";
 import { Theme, useTheme } from "@mui/material/styles";
 
-const convertDate = (date: string) => {
-    let normalDate = new Date(date);
-    return normalDate.toLocaleString("en-NZ");
-};
+function getStyles(name: string, selectCategories: readonly string[], theme: Theme) {
+    return {
+        fontWeight:
+            selectCategories.indexOf(name) === -1
+                ? theme.typography.fontWeightRegular
+                : theme.typography.fontWeightMedium,
+    };
+}
 
 export const Auctions = () => {
     const [auctionList, setAuctionList] = useState<AuctionOut[] | []>([]);
@@ -37,7 +41,19 @@ export const Auctions = () => {
 
     // Filtering paramters
     const [searchQ, setSearchQ] = useState("");
-    const [filterCategories, setFilterCategories] = useState([]);
+
+    const theme = useTheme();
+    const [selectCategories, setSelectCategories] = useState<string[]>([]);
+
+    const handleCategorySelector = (event: SelectChangeEvent<typeof selectCategories>) => {
+        const {
+            target: { value },
+        } = event;
+        setSelectCategories(
+            // On autofill we get a stringified value.
+            typeof value === "string" ? value.split(",") : value
+        );
+    };
 
     const retrieveAuctions = () => {
         const filtering = {
@@ -45,7 +61,11 @@ export const Auctions = () => {
             // count: displayAmount,
             // sortBy: convertToBackEndSort(sortByString),
             q: searchQ,
-            // categoryIds: filterCategories,
+            categoryIds: categories
+                .filter((item: any) => selectCategories.includes(item.name))
+                .map((item: any) => {
+                    return item.categoryId;
+                }),
             // status: statusString,
         };
         axios.get(`http://localhost:4941/api/v1/auctions`, { params: filtering }).then(
@@ -65,16 +85,32 @@ export const Auctions = () => {
     };
 
     const getCategories = () => {
-        axios.get("http://localhost:4941/api/v1/auctions/categories").then((res) => {
-            setCategories(res.data);
-            setErrorFlag(false);
-            setErrorMessage("");
-        });
+        axios.get("http://localhost:4941/api/v1/auctions/categories").then(
+            (res) => {
+                setCategories(res.data);
+                setErrorFlag(false);
+                setErrorMessage("");
+            },
+            (error) => {
+                setCategories([]);
+                setErrorFlag(true);
+                setErrorMessage(error);
+                setCount(0);
+            }
+        );
     };
 
     useEffect(() => {
         retrieveAuctions();
-    }, [searchQ]);
+    }, [searchQ, selectCategories]);
+
+    console.log(
+        categories
+            .filter((item: any) => selectCategories.includes(item.name))
+            .map((item: any) => {
+                return item.categoryId;
+            })
+    );
 
     useEffect(() => {
         getCategories();
@@ -171,6 +207,42 @@ export const Auctions = () => {
                             }
                         }}
                     />
+                    <FormControl sx={{ m: 1, width: 300 }}>
+                        <InputLabel id="multiple-category-selector-label">Category Selector</InputLabel>
+                        <Select
+                            labelId="multiple-category-selector-label"
+                            id="multi-category"
+                            multiple
+                            value={selectCategories}
+                            onChange={handleCategorySelector}
+                            input={<OutlinedInput id="select-multiple-chip" label="Category Selector" />}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            )}
+                            MenuProps={{
+                                PaperProps: {
+                                    style: {
+                                        maxHeight: 48 * 4.5 + 8,
+                                        width: 250,
+                                    },
+                                },
+                            }}
+                        >
+                            {categories
+                                .map((cat: any) => {
+                                    return cat.name;
+                                })
+                                .map((name) => (
+                                    <MenuItem key={name} value={name} style={getStyles(name, selectCategories, theme)}>
+                                        {name}
+                                    </MenuItem>
+                                ))}
+                        </Select>
+                    </FormControl>
                     <p style={{ color: "gray" }}>
                         {count <= 1
                             ? count === 0
