@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AuctionOut } from "../types/auctionTypes.d";
+import { AuctionOut } from "../types/auctionTypes";
 import axios from "axios";
 import "../style/AuctionCards.css";
 import "../style/Auctions.css";
@@ -23,8 +23,11 @@ import {
     ButtonGroup,
     Pagination,
     Stack,
+    Link,
 } from "@mui/material";
 import { Theme, useTheme } from "@mui/material/styles";
+import { SingleAuction } from "./SingleAuction";
+import { Link as RouterLink } from "react-router-dom";
 
 function getStyles(name: string, selectCategories: readonly string[], theme: Theme) {
     return {
@@ -130,7 +133,7 @@ export const Auctions = () => {
         return auctionList.map((item: AuctionOut) => {
             return (
                 <Card sx={{ maxWidth: 350 }} className="auctions_card_body" key={item.auctionId}>
-                    <CardActionArea>
+                    <CardActionArea component={RouterLink} to={`/auctions/${item.auctionId}`}>
                         <CardMedia
                             component="img"
                             height="150"
@@ -169,7 +172,14 @@ export const Auctions = () => {
                         </CardContent>
                     </CardActionArea>
                     <CardActions>
-                        <Button size="medium" color="info" variant="outlined" fullWidth>
+                        <Button
+                            size="medium"
+                            color="info"
+                            variant="outlined"
+                            fullWidth
+                            component={RouterLink}
+                            to={`/auctions/${item.auctionId}`}
+                        >
                             View More Info
                         </Button>
                     </CardActions>

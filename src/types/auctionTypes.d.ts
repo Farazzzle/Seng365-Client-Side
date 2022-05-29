@@ -9,4 +9,5 @@ export interface AuctionOut {
     sellerId: number;
     sellerFirstName: string;
     sellerLastName: string;
+    description?: string;
 }
