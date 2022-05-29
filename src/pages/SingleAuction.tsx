@@ -22,11 +22,34 @@ import {
     ListItemAvatar,
     Button,
     CardActionArea,
+    Modal,
+    TextField,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
 } from "@mui/material";
 import { BidOut } from "../types/bidTypes.d";
 import { Link as RouterLink } from "react-router-dom";
 import "../style/AuctionCards.css";
 import "../style/Auctions.css";
+import { getUserId, isLoggedIn } from "../helpers/LoginHelpers";
+import { postBid } from "../helpers/AuctionHelper";
+
+const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    pt: 2,
+    px: 4,
+    pb: 3,
+};
 
 const convertDate = (date: string) => {
     let normalDate = new Date(date);
@@ -45,6 +68,13 @@ export const SingleAuction = () => {
     // const [userId, setUserId] = useState<number | undefined>(undefined)
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [disableBidButton, setDisableBidButton] = useState(false);
+    const [buttonMessage, setButtonMessage] = useState("");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [bidAmount, setBidAmount] = useState<string>("");
+    const [bidError, setBidError] = useState(false);
+    const [bidHelper, setBidHelper] = useState("");
+    const [refresh, setRefresh] = useState(false);
 
     const getAuctionInfo = () => {
         axios.get(`http://localhost:4941/api/v1/auctions/${props.id}`).then(
@@ -230,15 +260,68 @@ export const SingleAuction = () => {
         });
     };
 
-    useEffect(() => {
-        getAuctionInfo();
-    }, []);
+    const getRemainingTime = (date: any) => {
+        let closingDate = new Date(date);
+        let now = new Date();
+        return Math.round(Math.round(closingDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    };
+
+    const validateBid = () => {
+        if (getRemainingTime(auctionInfo?.endDate) < 0) {
+            setDisableBidButton(true);
+            setButtonMessage("Auction finished.");
+        } else if (!isLoggedIn()) {
+            setDisableBidButton(true);
+            setButtonMessage("Login to place bid.");
+        } else if (getUserId() === auctionInfo?.auctionId) {
+            setDisableBidButton(true);
+            setButtonMessage("Cannot bid on your own auction.");
+        } else if (parseFloat(bidAmount) % 1 !== 0) {
+            setBidError(true);
+            setBidHelper("Enter an integer.");
+        } else if (parseInt(bidAmount) <= 0) {
+            setBidError(true);
+            setBidHelper("Cannot bid equal to or lower than $0.");
+        } else if (auctionInfo?.highestBid) {
+            if (parseInt(bidAmount) <= auctionInfo?.highestBid) {
+                setBidError(true);
+                setBidHelper("Bid is lower than highest bid.");
+            } else {
+                setDisableBidButton(false);
+                setButtonMessage("");
+                setBidError(false);
+                setBidHelper("");
+            }
+        } else {
+            setDisableBidButton(false);
+            setButtonMessage("");
+            setBidError(false);
+            setBidHelper("");
+        }
+    };
 
     useEffect(() => {
         getCatName();
         getBids();
         getSimilarAuctions();
-    }, [auctionInfo]);
+    }, [auctionInfo, refresh]);
+
+    useEffect(() => {
+        getAuctionInfo();
+    }, [refresh]);
+
+    useEffect(() => {
+        validateBid();
+    }, [bidAmount, []]);
+
+    const placeBid = async () => {
+        if (!disableBidButton && !bidError && auctionInfo !== undefined) {
+            const response = await postBid(auctionInfo.auctionId, parseInt(bidAmount));
+        }
+        setRefresh(!refresh);
+    };
+
+    console.log(bidAmount);
 
     if (auctionInfo) {
         return (
@@ -295,6 +378,42 @@ export const SingleAuction = () => {
                             </Stack>
                         </Card>
                         <Typography>{auctionInfo.numBids} Bids on Auction</Typography>
+                        <Button
+                            variant="contained"
+                            disabled={disableBidButton}
+                            onClick={() => {
+                                setOpenDialog(true);
+                            }}
+                        >
+                            Place Bid
+                        </Button>
+                        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                            <DialogTitle>Place Bid</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>Place a bid above the current highest bid.</DialogContentText>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="bid amount"
+                                    label="Bid Amount"
+                                    type="number"
+                                    fullWidth
+                                    variant="standard"
+                                    helperText={bidHelper}
+                                    error={bidError}
+                                    onChange={(event) => {
+                                        setBidAmount(event.target.value);
+                                    }}
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                                <Button onClick={placeBid}>Place Bid</Button>
+                            </DialogActions>
+                        </Dialog>
+                        <Typography variant="h6" sx={{ color: "red" }}>
+                            {buttonMessage}
+                        </Typography>
                         <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>{displayBids()}</List>
                     </Box>
                 </Box>
