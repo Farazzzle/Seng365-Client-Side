@@ -38,7 +38,7 @@ export default function SignIn() {
             const response = await login(email, password);
 
             if (response !== 200) {
-                setOtherError("Could not login");
+                setOtherError("Invalid Email/Password Combo");
                 return;
             }
 

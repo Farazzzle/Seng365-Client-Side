@@ -86,6 +86,7 @@ export default function SignUp() {
     };
 
     const changeProfile = async (e: any) => {
+        console.log(e.target.files);
         const file = e.target.files[0];
         setProfilePhoto(file);
         console.log(file);
@@ -150,7 +151,7 @@ export default function SignUp() {
                     <Typography color="red" variant="h5">
                         {otherError}
                     </Typography>
-                    <Avatar alt="Remy Sharp" src={imageSrc} sx={{ width: 150, height: 150, margin: 2 }} />
+                    <Avatar src={imageSrc} sx={{ width: 150, height: 150, margin: 2 }} />
                     <Stack direction="row" alignItems="center" spacing={2}>
                         <label htmlFor="contained-button-file">
                             <Input

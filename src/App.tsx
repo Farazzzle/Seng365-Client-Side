@@ -5,6 +5,7 @@ import { NavigationPane } from "./components/Navigation";
 import { SingleAuction } from "./pages/SingleAuction";
 import SignUp from "./pages/Register";
 import SignIn from "./pages/LogIn";
+import { Profile } from "./pages/ProfileView";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/auctions/:id" element={<SingleAuction />} />
                     <Route path="/register" element={<SignUp />} />
                     <Route path="/login" element={<SignIn />} />
+                    <Route path="/profile" element={<Profile />} />
                 </Routes>
             </Router>
         </div>
