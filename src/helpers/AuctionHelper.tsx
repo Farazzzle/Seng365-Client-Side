@@ -50,11 +50,7 @@ export const patchAuction = async (body: any, auctionId: number) => {
         },
     };
 
-    const response = await axios
-        .patch(`http://localhost:4941/api/v1/auctions/${auctionId}`, body, config)
-        .catch((error) => {
-            return undefined;
-        });
+    const response = await axios.patch(`http://localhost:4941/api/v1/auctions/${auctionId}`, body, config);
     return response;
 };
 

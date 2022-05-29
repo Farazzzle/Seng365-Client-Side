@@ -388,9 +388,7 @@ export const SingleAuction = () => {
                         <Typography>{auctionInfo.numBids} Bids on Auction</Typography>
                         <Button
                             variant="contained"
-                            disabled={
-                                disableBidButton || getUserId() === auctionInfo.sellerId || auctionInfo.numBids > 0
-                            }
+                            disabled={disableBidButton || getUserId() === auctionInfo.sellerId}
                             onClick={() => {
                                 setOpenDialog(true);
                             }}
@@ -399,7 +397,11 @@ export const SingleAuction = () => {
                         </Button>
                         <Button
                             variant="contained"
-                            disabled={auctionInfo.numBids > 0 || getUserId() !== auctionInfo.sellerId}
+                            disabled={
+                                auctionInfo.numBids > 0 ||
+                                getUserId() !== auctionInfo.sellerId ||
+                                auctionInfo.numBids > 0
+                            }
                             onClick={() => {
                                 setDeleteDialog(true);
                             }}
@@ -424,7 +426,7 @@ export const SingleAuction = () => {
                                 </Button>
                             </DialogContent>
                         </Dialog>
-                        <CreateAuction edit={true} id={auctionInfo.auctionId} />
+                        <CreateAuction edit={true} auctionInfo={auctionInfo} />
                         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                             <DialogTitle>Place Bid</DialogTitle>
                             <DialogContent>

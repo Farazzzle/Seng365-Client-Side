@@ -29,7 +29,7 @@ import { uploadPhoto } from "../helpers/AuctionHelper";
 
 const acceptedFileTypes = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
 
-export const CreateAuction = ({ edit, id }: any) => {
+export const CreateAuction = ({ edit, auctionInfo }: any) => {
     const [sellerId, setSellerId] = useState(null);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -55,6 +55,9 @@ export const CreateAuction = ({ edit, id }: any) => {
         } else if (description.length <= 0) {
             setErrorFlag(true);
             setErrorMessage("Enter description");
+        } else if (!choseCatId) {
+            setErrorFlag(true);
+            setErrorMessage("Select a category");
         } else {
             setErrorFlag(false);
             setErrorMessage("");
@@ -125,7 +128,7 @@ export const CreateAuction = ({ edit, id }: any) => {
                     title: title,
                     description: description,
                     endDate: formattedDate,
-                    categoryId: choseCatId ? choseCatId : null,
+                    categoryId: choseCatId ? choseCatId : 0,
                     reserve: reserve >= 1 ? reserve : null,
                 };
             } else {
@@ -133,23 +136,23 @@ export const CreateAuction = ({ edit, id }: any) => {
                     title: title,
                     description: description,
                     endDate: formattedDate,
-                    categoryId: choseCatId ? choseCatId : null,
+                    categoryId: choseCatId ? choseCatId : 0,
                 };
             }
 
             let auctionIdTemp;
             if (edit) {
-                const response = await patchAuction(body, id);
+                const response = await patchAuction(body, auctionInfo.auctionId);
                 if (response === undefined || response.status !== 200) {
                     console.log(response);
                     setErrorFlag(true);
                     setErrorMessage("Error patching auction.");
                     return;
                 }
-                auctionIdTemp = id;
+                auctionIdTemp = auctionInfo.auctionId;
             } else {
                 const response = await postAuction(body);
-                if (response == undefined) return;
+                if (response === undefined) return;
                 if (response.status !== 201) {
                     console.log(response);
                     setErrorFlag(true);
@@ -172,7 +175,8 @@ export const CreateAuction = ({ edit, id }: any) => {
         }
     };
 
-    if (getUserId() === id) {
+    // console.log(auctionInfo);
+    if (auctionInfo !== undefined && getUserId() === auctionInfo.sellerId) {
         return (
             <Box>
                 <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={!isLoggedIn()}>

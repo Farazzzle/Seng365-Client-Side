@@ -130,6 +130,20 @@ export const Auctions = () => {
         return Math.round(Math.round(closingDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     };
 
+    interface catOut {
+        categoryId: number;
+        name: string;
+    }
+
+    const categoriesFilter = (item: AuctionOut) => {
+        const name: catOut[] = categories.filter((cat: any) => cat.categoryId === item.categoryId);
+        if (name.length > 0 && name !== undefined) {
+            if ("name" in Object.keys(name)) {
+                return name[0]["name"];
+            }
+        }
+    };
+
     // Creating a card of the auctions
     const listOfAuctions = () => {
         return auctionList.map((item: AuctionOut) => {
@@ -161,8 +175,7 @@ export const Auctions = () => {
                                     ? "Auction Closed"
                                     : `Ending in ${getRemainingTime(item.endDate)} days.`}{" "}
                                 <br></br>
-                                Category:{" "}
-                                {categories.filter((cat: any) => cat.categoryId === item.categoryId)[0]["name"]}
+                                Category: {categoriesFilter(item)}
                                 <br></br>
                                 Num of Bids: {item.numBids} <br></br>
                                 Highest Bid: {item.numBids === 0 ? "None" : "$" + item.highestBid} <br></br>
