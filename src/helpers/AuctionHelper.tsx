@@ -88,3 +88,9 @@ export const uploadPhoto = async (image: any, auctionId: number) => {
             return error.response.status;
         });
 };
+
+export const fetchCategories = async () => {
+    const response = await axios.get(`http://localhost:4941/api/v1/auctions/categories`);
+    if (response.status !== 200) return [];
+    return response.data;
+};

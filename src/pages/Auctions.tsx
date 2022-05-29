@@ -28,6 +28,8 @@ import {
 import { Theme, useTheme } from "@mui/material/styles";
 import { SingleAuction } from "./SingleAuction";
 import { Link as RouterLink } from "react-router-dom";
+import { CreateAuction } from "../components/AuctionCreate";
+import { getUserId } from "../helpers/LoginHelpers";
 
 function getStyles(name: string, selectCategories: readonly string[], theme: Theme) {
     return {
@@ -285,7 +287,9 @@ export const Auctions = () => {
                             <MenuItem value="ALPHABETICAL_ASC">Alphabetical A-Z</MenuItem>
                             <MenuItem value="ALPHABETICAL_DESC">Alphabetical Z-A</MenuItem>
                         </Select>
+                        <CreateAuction edit={false} id={getUserId()} />
                     </FormControl>
+
                     <p style={{ color: "gray" }}>
                         {count <= 1
                             ? count === 0

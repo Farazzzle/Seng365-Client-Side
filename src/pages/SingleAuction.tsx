@@ -35,7 +35,8 @@ import { Link as RouterLink } from "react-router-dom";
 import "../style/AuctionCards.css";
 import "../style/Auctions.css";
 import { getUserId, isLoggedIn } from "../helpers/LoginHelpers";
-import { postBid } from "../helpers/AuctionHelper";
+import { deleteAuction, postBid } from "../helpers/AuctionHelper";
+import { CreateAuction } from "../components/AuctionCreate";
 
 const style = {
     position: "absolute" as "absolute",
@@ -75,6 +76,7 @@ export const SingleAuction = () => {
     const [bidError, setBidError] = useState(false);
     const [bidHelper, setBidHelper] = useState("");
     const [refresh, setRefresh] = useState(false);
+    const [deleteDialog, setDeleteDialog] = useState(false);
 
     const getAuctionInfo = () => {
         axios.get(`http://localhost:4941/api/v1/auctions/${props.id}`).then(
@@ -321,7 +323,13 @@ export const SingleAuction = () => {
         setRefresh(!refresh);
     };
 
-    console.log(bidAmount);
+    const handleDelete = async () => {
+        if (auctionInfo?.auctionId) {
+            const response = await deleteAuction(auctionInfo?.auctionId);
+            if (response === undefined || response.status !== 200) console.log(response);
+            window.open(`/auctions`, "_self");
+        }
+    };
 
     if (auctionInfo) {
         return (
@@ -380,13 +388,43 @@ export const SingleAuction = () => {
                         <Typography>{auctionInfo.numBids} Bids on Auction</Typography>
                         <Button
                             variant="contained"
-                            disabled={disableBidButton}
+                            disabled={
+                                disableBidButton || getUserId() === auctionInfo.sellerId || auctionInfo.numBids > 0
+                            }
                             onClick={() => {
                                 setOpenDialog(true);
                             }}
                         >
                             Place Bid
                         </Button>
+                        <Button
+                            variant="contained"
+                            disabled={auctionInfo.numBids > 0 || getUserId() !== auctionInfo.sellerId}
+                            onClick={() => {
+                                setDeleteDialog(true);
+                            }}
+                            color="error"
+                        >
+                            Delete Auction
+                        </Button>
+                        <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
+                            <DialogTitle sx={{ color: "red" }}>Delete Auction</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    Are you sure you want to delete this auction? There is no going back.
+                                </DialogContentText>
+                                <Button
+                                    sx={{ fontFamily: "Oxygen" }}
+                                    variant="contained"
+                                    component="span"
+                                    color="error"
+                                    onClick={handleDelete}
+                                >
+                                    Confirm Delete
+                                </Button>
+                            </DialogContent>
+                        </Dialog>
+                        <CreateAuction edit={true} id={auctionInfo.auctionId} />
                         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                             <DialogTitle>Place Bid</DialogTitle>
                             <DialogContent>
@@ -414,6 +452,7 @@ export const SingleAuction = () => {
                         <Typography variant="h6" sx={{ color: "red" }}>
                             {buttonMessage}
                         </Typography>
+
                         <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>{displayBids()}</List>
                     </Box>
                 </Box>
