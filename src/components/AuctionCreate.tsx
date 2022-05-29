@@ -64,7 +64,7 @@ export const CreateAuction = ({ edit, id }: any) => {
     const categoryMenuItems = () => {
         return categories.map((item: any) => {
             return (
-                <MenuItem value={item.categoryId} onClick={setCategory}>
+                <MenuItem key={item.categoryId} value={item.categoryId} onClick={setCategory}>
                     {item.name}
                 </MenuItem>
             );

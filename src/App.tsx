@@ -6,6 +6,7 @@ import { SingleAuction } from "./pages/SingleAuction";
 import SignUp from "./pages/Register";
 import SignIn from "./pages/LogIn";
 import { Profile } from "./pages/ProfileView";
+import { MyAuctions } from "./pages/MyAuctions";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/register" element={<SignUp />} />
                     <Route path="/login" element={<SignIn />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/myauctions" element={<MyAuctions />} />
                 </Routes>
             </Router>
         </div>

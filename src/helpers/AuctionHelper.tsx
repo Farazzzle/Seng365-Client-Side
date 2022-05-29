@@ -21,6 +21,11 @@ export const postBid = async (auctionId: number, amount: number) => {
     return response;
 };
 
+export const fetchAuctions = async (config: any) => {
+    const response = await axios.get(`http://localhost:4941/api/v1/auctions`, { params: config });
+    return response;
+};
+
 export const postAuction = async (body: any) => {
     if (!isLoggedIn()) return;
 
