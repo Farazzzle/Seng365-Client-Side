@@ -137,10 +137,8 @@ export const Auctions = () => {
 
     const categoriesFilter = (item: AuctionOut) => {
         const name: catOut[] = categories.filter((cat: any) => cat.categoryId === item.categoryId);
-        if (name.length > 0 && name !== undefined) {
-            if ("name" in Object.keys(name)) {
-                return name[0]["name"];
-            }
+        if (name !== undefined) {
+            return name[0]["name"];
         }
     };
 
@@ -175,7 +173,7 @@ export const Auctions = () => {
                                     ? "Auction Closed"
                                     : `Ending in ${getRemainingTime(item.endDate)} days.`}{" "}
                                 <br></br>
-                                Category: {categoriesFilter(item)}
+                                Category: {categories.length > 0 ? categoriesFilter(item) : ""}
                                 <br></br>
                                 Num of Bids: {item.numBids} <br></br>
                                 Highest Bid: {item.numBids === 0 ? "None" : "$" + item.highestBid} <br></br>

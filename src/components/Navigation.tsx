@@ -62,7 +62,7 @@ export const NavigationPane = () => {
         <div>
             <nav className="navbar">
                 <div className="nav-container">
-                    <NavLink to="/" className="nav-logo">
+                    <NavLink to="/auctions" className="nav-logo">
                         Seng365
                         <i className="fas fa-code"></i>
                     </NavLink>

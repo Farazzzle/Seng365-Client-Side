@@ -85,7 +85,7 @@ export const CreateAuction = ({ edit, auctionInfo }: any) => {
 
     useEffect(() => {
         validateInfo();
-    }, [title, reserve, description]);
+    }, [title, reserve, description, choseCatId]);
 
     useEffect(() => {
         getCategories();
@@ -175,120 +175,124 @@ export const CreateAuction = ({ edit, auctionInfo }: any) => {
         }
     };
 
-    // console.log(auctionInfo);
-    if (auctionInfo !== undefined && getUserId() === auctionInfo.sellerId) {
-        return (
-            <Box>
-                <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={!isLoggedIn()}>
-                    {edit ? "Edit Auction" : "Create Auction"}
-                </Button>
+    const disableButton = () => {
+        if (edit) {
+            if (getUserId() !== auctionInfo.sellerId) {
+                return true;
+            }
+        } else if (!isLoggedIn()) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    return (
+        <Box>
+            <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={disableButton()}>
+                {edit ? "Edit Auction" : "Create Auction"}
+            </Button>
 
-                <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                    <DialogTitle>Create Auction</DialogTitle>
-                    <Typography sx={{ color: "red" }} variant="subtitle1">
-                        {errorMessage}
-                    </Typography>
-                    <DialogContent>
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                            <label htmlFor="contained-button-file">
-                                <Input
-                                    // accept=".jpg,.jpeg,.png,.gif"
-                                    id="contained-button-file"
-                                    type="file"
-                                    onChange={async (e) => await changeImage(e)}
-                                />
-                                <Button
-                                    sx={{ fontFamily: "Oxygen" }}
-                                    variant="contained"
-                                    component="span"
-                                    endIcon={<PhotoCamera />}
-                                >
-                                    Upload
-                                </Button>
-                            </label>
-                        </Stack>
-                        <Grid
-                            pb={3}
-                            sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-                            item
-                            xs={12}
-                        >
-                            <label htmlFor="file-input">
-                                <img style={{ height: "200px", width: "auto" }} src={imageSrc}></img>
-                            </label>
-                            <input
-                                hidden
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Create Auction</DialogTitle>
+                <Typography sx={{ color: "red" }} variant="subtitle1">
+                    {errorMessage}
+                </Typography>
+                <DialogContent>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <label htmlFor="contained-button-file">
+                            <Input
+                                // accept=".jpg,.jpeg,.png,.gif"
+                                id="contained-button-file"
                                 type="file"
-                                accept=".jpg,.jpeg,.png,.gif"
-                                id="file-input"
                                 onChange={async (e) => await changeImage(e)}
                             />
-                        </Grid>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="title"
-                            label="Title"
-                            required
-                            fullWidth
-                            onChange={(event) => setTitle(event.target.value)}
-                        />
-                        <FormControl fullWidth>
-                            <InputLabel id="category-select-label">Category</InputLabel>
-                            <Select
-                                labelId="category-select-label"
-                                id="simple-select-category"
-                                value={chosenCategory}
-                                label="Category"
-                                onChange={(event) => setChosenCategory(event.target.value)}
+                            <Button
+                                sx={{ fontFamily: "Oxygen" }}
+                                variant="contained"
+                                component="span"
+                                endIcon={<PhotoCamera />}
                             >
-                                {categoryMenuItems()}
-                            </Select>
-                        </FormControl>
-                        <Grid>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} fullwidth>
-                                <DateTimePicker
-                                    label="Date&Time picker"
-                                    value={endDate}
-                                    onChange={(newDate: Date | null) => {
-                                        setEndDate(newDate);
-                                    }}
-                                    renderInput={(params) => <TextField {...params} />}
-                                    minDate={new Date(moment().clone().add(1, "days").toISOString())}
-                                />
-                            </LocalizationProvider>
-                        </Grid>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="reserve amount"
-                            label="Reserve Amount"
-                            type="number"
-                            fullWidth
-                            variant="standard"
-                            onChange={(event) => {
-                                setReserve(parseInt(event.target.value));
-                            }}
-                            defaultValue={1}
+                                Upload
+                            </Button>
+                        </label>
+                    </Stack>
+                    <Grid pb={3} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }} item xs={12}>
+                        <label htmlFor="file-input">
+                            <img style={{ height: "200px", width: "auto" }} src={imageSrc}></img>
+                        </label>
+                        <input
+                            hidden
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.gif"
+                            id="file-input"
+                            onChange={async (e) => await changeImage(e)}
                         />
-                        <TextField
-                            fullWidth
-                            required
-                            id="outlined-multiline-static"
-                            label="Description"
-                            multiline
-                            rows={4}
-                            onChange={(event) => {
-                                setDescription(event.target.value);
-                            }}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-                        <Button onClick={create}>{edit ? "Finish Editing" : "Create Auction"}</Button>
-                    </DialogActions>
-                </Dialog>
-            </Box>
-        );
-    } else return <h1></h1>;
+                    </Grid>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="title"
+                        label="Title"
+                        required
+                        fullWidth
+                        onChange={(event) => setTitle(event.target.value)}
+                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="category-select-label">Category</InputLabel>
+                        <Select
+                            labelId="category-select-label"
+                            id="simple-select-category"
+                            value={chosenCategory}
+                            label="Category"
+                            onChange={(event) => setChosenCategory(event.target.value)}
+                        >
+                            {categoryMenuItems()}
+                        </Select>
+                    </FormControl>
+                    <Grid>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} fullwidth>
+                            <DateTimePicker
+                                label="Date&Time picker"
+                                value={endDate}
+                                onChange={(newDate: Date | null) => {
+                                    setEndDate(newDate);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                                minDate={new Date(moment().clone().add(1, "days").toISOString())}
+                            />
+                        </LocalizationProvider>
+                    </Grid>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="reserve amount"
+                        label="Reserve Amount"
+                        type="number"
+                        fullWidth
+                        variant="standard"
+                        onChange={(event) => {
+                            setReserve(parseInt(event.target.value));
+                        }}
+                        defaultValue={1}
+                    />
+                    <TextField
+                        fullWidth
+                        required
+                        id="outlined-multiline-static"
+                        label="Description"
+                        multiline
+                        rows={4}
+                        onChange={(event) => {
+                            setDescription(event.target.value);
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                    <Button onClick={create}>{edit ? "Finish Editing" : "Create Auction"}</Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+    // } else return <h1></h1>;
 };

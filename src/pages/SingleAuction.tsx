@@ -98,8 +98,8 @@ export const SingleAuction = () => {
             (res) => {
                 setCategories(res.data);
                 const cat = res.data.filter((item: any) => item.categoryId === auctionInfo?.categoryId);
-                if (cat) {
-                    setCategoryName(cat[0].name);
+                if (cat.length > 0) {
+                    setCategoryName(cat[0]["name"]);
                 }
                 setErrorFlag(false);
                 setErrorMessage("");
@@ -337,7 +337,7 @@ export const SingleAuction = () => {
                 <Box sx={{ display: "flex", flexDirection: "row" }}>
                     <Card sx={{ display: "flex" }} className="single_auction_card">
                         <CardMedia
-                            sx={{}}
+                            sx={{ maxWidth: "50%" }}
                             component="img"
                             image={`http://localhost:4941/api/v1/auctions/${auctionInfo.auctionId}/image`}
                             alt="auction bid"
@@ -376,6 +376,7 @@ export const SingleAuction = () => {
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                         <Card sx={{ display: "flex" }} className="single_auction_seller">
                             <Stack direction="row" spacing={2}>
+                                <Typography>Seller:</Typography>
                                 <Avatar
                                     alt={`${auctionInfo.sellerFirstName}`}
                                     src={`http://localhost:4941/api/v1/users/${auctionInfo.sellerId}/image`}

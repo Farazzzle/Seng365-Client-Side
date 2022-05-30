@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Link as RouterLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { login } from "../helpers/LoginHelpers";
+import { isLoggedIn } from "../helpers/LoginHelpers";
 
 const theme = createTheme();
 
@@ -79,75 +80,82 @@ export default function SignIn() {
         validate();
     }, [email, password]);
 
-    return (
-        <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign in
-                    </Typography>
-                    <Typography color="red">{otherError}</Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                            onChange={(event) => {
-                                setEmail(event.target.value);
-                            }}
-                            error={emailError}
-                            helperText={emailHelper}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            onChange={(event) => {
-                                setPassword(event.target.value);
-                            }}
-                            error={passwordError}
-                            helperText={passwordHelper}
-                        />
-                        <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
-                        <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleSubmit}>
-                            Sign In
-                        </Button>
-                        <Grid container>
-                            <Grid item>
-                                <Link
-                                    variant="body2"
-                                    sx={{ fontFamily: "Oxygen" }}
-                                    component={RouterLink}
-                                    to={`/register`}
-                                >
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
+    if (!isLoggedIn()) {
+        return (
+            <ThemeProvider theme={theme}>
+                <Container component="main" maxWidth="xs">
+                    <CssBaseline />
+                    <Box
+                        sx={{
+                            marginTop: 8,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Sign in
+                        </Typography>
+                        <Typography color="red">{otherError}</Typography>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                onChange={(event) => {
+                                    setEmail(event.target.value);
+                                }}
+                                error={emailError}
+                                helperText={emailHelper}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                onChange={(event) => {
+                                    setPassword(event.target.value);
+                                }}
+                                error={passwordError}
+                                helperText={passwordHelper}
+                            />
+                            <FormControlLabel
+                                control={<Checkbox value="remember" color="primary" />}
+                                label="Remember me"
+                            />
+                            <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleSubmit}>
+                                Sign In
+                            </Button>
+                            <Grid container>
+                                <Grid item>
+                                    <Link
+                                        variant="body2"
+                                        sx={{ fontFamily: "Oxygen" }}
+                                        component={RouterLink}
+                                        to={`/register`}
+                                    >
+                                        {"Don't have an account? Sign Up"}
+                                    </Link>
+                                </Grid>
                             </Grid>
-                        </Grid>
+                        </Box>
                     </Box>
-                </Box>
-            </Container>
-        </ThemeProvider>
-    );
+                </Container>
+            </ThemeProvider>
+        );
+    } else {
+        return <h1>Already logged in, please logout first to login with another account.</h1>;
+    }
 }

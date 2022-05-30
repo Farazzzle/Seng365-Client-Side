@@ -14,6 +14,7 @@ function App() {
             <Router>
                 <NavigationPane />
                 <Routes>
+                    <Route path="/" element={<Auctions />} />
                     <Route path="/auctions" element={<Auctions />} />
                     <Route path="/auctions/:id" element={<SingleAuction />} />
                     <Route path="/register" element={<SignUp />} />
