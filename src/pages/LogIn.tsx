@@ -18,6 +18,9 @@ import { Link as RouterLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { login } from "../helpers/LoginHelpers";
 import { isLoggedIn } from "../helpers/LoginHelpers";
+import { IconButton, Stack, InputLabel, InputAdornment, Input as MuiInput, Paper } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const theme = createTheme();
 
@@ -29,6 +32,7 @@ export default function SignIn() {
     const [passwordError, setPasswordError] = useState(false);
     const [passwordHelper, setPasswordHelper] = useState("");
     const [otherError, setOtherError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async () => {
         if (passwordError || emailError) {
@@ -122,7 +126,7 @@ export default function SignIn() {
                                 fullWidth
                                 name="password"
                                 label="Password"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 id="password"
                                 autoComplete="current-password"
                                 onChange={(event) => {
@@ -130,6 +134,24 @@ export default function SignIn() {
                                 }}
                                 error={passwordError}
                                 helperText={passwordHelper}
+                                InputProps={{
+                                    // <-- This is where the toggle button is added.
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() => {
+                                                    setShowPassword(!showPassword);
+                                                }}
+                                                onMouseDown={() => {
+                                                    setShowPassword(!showPassword);
+                                                }}
+                                            >
+                                                {showPassword ? <Visibility /> : <VisibilityOff />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <FormControlLabel
                                 control={<Checkbox value="remember" color="primary" />}
